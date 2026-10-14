@@ -87,7 +87,7 @@ const verificarToken = (req, res, next) => {
   }
 };
 app.get("/", (req, res) => {
-    res.send("Bienvenido a Inventario API");
+    res.send("Bienvenido a Sistema de Incidencias");
 });
 
 
