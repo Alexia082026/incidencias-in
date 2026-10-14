@@ -40,12 +40,13 @@ const ESTADOS_VALIDOS = ["Pendiente", "En revisión", "En proceso", "Resuelto"];
 // Cloud); si no (desarrollo local con XAMPP), usa los valores por defecto.
 // DB_HOST presente = estamos en la nube => se activa SSL.
 const conexion = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  port: process.env.DB_PORT || "3308",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "incidencias_escolares",
-  ssl: process.env.DB_HOST ? { rejectUnauthorized: false } : false,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: { 
+    rejectUnauthorized: true
 });
 
 conexion.connect((error) => {
