@@ -86,6 +86,10 @@ const verificarToken = (req, res, next) => {
     return res.status(401).json({ mensaje: "Token inválido o expirado" });
   }
 };
+app.get("/", (req, res) => {
+    res.send("Bienvenido a Inventario API");
+});
+
 
 // ---------------- AUTENTICACIÓN ----------------
 
