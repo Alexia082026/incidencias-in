@@ -165,7 +165,14 @@ app.get('/categorias', async (req, res) => {
 });
 
 // CREAR INCIDENCIA (Acepta foto de evidencia)
-app.post('/incidencias', upload.single('evidencia'), async (req, res) => {
+// CREAR INCIDENCIA (Adaptado para la columna 'imagen')
+app.post('/incidencias', (req, res, next) => {
+  // Acepta la foto tanto si la app la envía como 'imagen' o como 'evidencia'
+  upload.fields([{ name: 'imagen', maxCount: 1 }, { name: 'evidencia', maxCount: 1 }])(req, res, (err) => {
+    if (err) return next(err);
+    next();
+  });
+}, async (req, res) => {
   try {
     const { usuario_id, categoria_id, descripcion } = req.body;
 
@@ -173,10 +180,16 @@ app.post('/incidencias', upload.single('evidencia'), async (req, res) => {
       return res.status(400).json({ error: 'La descripción es obligatoria' });
     }
 
-    // Ruta o nombre del archivo de imagen subido (si se adjuntó)
-    const evidencia = req.file ? `/uploads/${req.file.filename}` : null;
+    // Detectar el archivo subido (ya sea que vino como req.files.imagen o req.files.evidencia)
+    let rutaImagen = null;
+    if (req.files) {
+      const file = req.files['imagen']?.[0] || req.files['evidencia']?.[0];
+      if (file) {
+        rutaImagen = `/uploads/${file.filename}`;
+      }
+    }
 
-    // Si tu categoría viene como texto ("Informática"), buscamos su ID
+    // Si categoría viene como texto ("Informática"), obtenemos su ID numérico
     let finalCategoriaId = categoria_id;
     if (isNaN(categoria_id)) {
       const [catRows] = await db.query(
@@ -188,17 +201,17 @@ app.post('/incidencias', upload.single('evidencia'), async (req, res) => {
       }
     }
 
-    // Insertar en la base de datos
+    // INSERT usando tu columna 'imagen'
     const [result] = await db.query(
-      `INSERT INTO incidencias (usuario_id, categoria_id, descripcion, evidencia, estado) 
+      `INSERT INTO incidencias (usuario_id, categoria_id, descripcion, imagen, estado) 
        VALUES (?, ?, ?, ?, 'Pendiente')`,
-      [usuario_id || null, finalCategoriaId || null, descripcion, evidencia]
+      [usuario_id || null, finalCategoriaId || null, descripcion, rutaImagen]
     );
 
     res.status(201).json({
       mensaje: 'Incidencia reportada con éxito',
       id: result.insertId,
-      evidencia
+      imagen: rutaImagen
     });
   } catch (error) {
     console.error('Error al registrar incidencia:', error);
