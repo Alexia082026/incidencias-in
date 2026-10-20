@@ -32,10 +32,15 @@ const db = mysql.createPool({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'incidencias_escolares',
-  port: process.env.DB_PORT || 3306,
+  port: process.env.DB_PORT || 4000,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // 👇 AGREGA ESTA LÍNEA DE AQUÍ ABAJO:
+  ssl: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  }
 });
 
 // Probar conexión a la base de datos
