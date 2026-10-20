@@ -212,11 +212,12 @@ app.post('/incidencias', (req, res, next) => {
       [usuario_id || null, finalCategoriaId || null, descripcion, rutaImagen]
     );
 
-    res.status(201).json({
+    res.status(200).json({
       mensaje: 'Incidencia reportada con éxito',
       id: result.insertId,
       imagen: rutaImagen
     });
+
   } catch (error) {
     console.error('Error al registrar incidencia:', error);
     res.status(500).json({ error: error.message });
